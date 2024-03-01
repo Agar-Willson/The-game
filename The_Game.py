@@ -61,29 +61,59 @@ class Player():
             self.vect_y  = 5
         dy += self.vect_y
         # collision
-        for tile in world.tile_list:
-            # x
-            if tile[1].colliderect(self.rect.x + dx, 10 ,self.width, self.height):
-                dx = 0
-            # y
-            if tile[1].colliderect(self.rect.x, self.rect.y + dy ,self.width, self.height):
-                if self.vect_y < 0:
-                    dy = tile[1].bottom - self.rect.top
-                    self.vect_y = 0 
-                elif self.vect_y >= 0:
-                    dy = tile[1].top - self.rect.bottom
-                    self.vect_y = 0 
+        # for tile in world.tile_list:
+        #     # x
+        #     if tile[1].colliderect(self.rect.x + dx, 10 ,self.width, self.height):
+        #         dx = 0
+        #     # y
+        #     if tile[1].colliderect(self.rect.x, self.rect.y + dy ,self.width, self.height):
+        #         if self.vect_y < 0:
+        #             dy = tile[1].bottom - self.rect.top
+        #             self.vect_y = 0 
+        #         elif self.vect_y >= 0:
+        #             dy = tile[1].top - self.rect.bottom
+        #             self.vect_y = 0 
 
+        tile_rects = [tile[1] for tile in world.tile_list]
+
+        # collision
+        # x
+        self.rect.x += dx
+        x_intersects = [tile for tile in tile_rects if self.rect.colliderect(tile)]
+        # if len(x_intersects) != (1 or 0):
+        #     raise Exception("what the fuck")
+        self.rect.x -= dx
+        self.rect.y += dy
+        y_intersects = [tile for tile in tile_rects if self.rect.colliderect(tile)]
+        # if len(y_intersects) != (1 or 0):
+        #     raise Exception("what the fuck 2")
+        self.rect.x += dx
+
+        rx = x_intersects[0] if x_intersects else None
+        ry = y_intersects[0] if y_intersects else None
+        
+        if rx:
+            if dx < 0:
+                self.rect.left = rx.right
+            elif dx > 0:
+                self.rect.right = rx.left
+        # y
+        if ry:
+            if dy < 0:
+                self.rect.top = ry.bottom
+                self.vect_y = 0
+            elif dy > 0:
+                self.rect.bottom = ry.top
 
 
         # coords
         
-        self.rect.x += dx
-        self.rect.y += dy
+        # self.rect.x += dx
+        # self.rect.y += dy
 
-        if self.rect.bottom > screen_hight:
-            self.rect.bottom = screen_hight
-            dy = 0
+        # if self.rect.bottom > screen_hight:
+        #     self.rect.bottom = screen_hight
+        #     dy = 0
 
 
         #draw player:
